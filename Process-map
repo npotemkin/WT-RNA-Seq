@@ -1,0 +1,61 @@
+#### Perform fastqc
+module load fastqc/0.11.5
+ fastqc -extract -outdir=./Data/QC_Data ./Data/Sample#_PGM.fastq
+
+
+ #### Adapter removal
+
+ module load AdapterRemoval/2.1.7-04d254b
+
+ AdapterRemoval --file1 Sample#_PGM.fastq --adapter1  --adapter2 GGCCAAGGCG --basename Sample#_PGM_AdaptTrim
+
+ 
+ #### Quality trimming
+
+ module load trimmomatic/0.38
+
+ trimmomatic-se -threads 4 -phred33 Sample#_PGM_AdaptTrim.truncated  Sample#_PGM_QualTrim.fastq SLIDINGWINDOW:5:20 MINLEN:17
+
+ 
+ #### Read Alignment
+
+ module load STAR/2.5.4b
+
+ ## Generate genome index
+
+ STAR --runThreadN 4 --runMode genomeGenerate --genomeDir ./GenomeRef --genomeFastaFiles ./Mus_musculus.GRCm38.dna.primary_assembly.fa --sjdbGTFfile ./Mus_musculus.GRCm38.95.chr.gtf --sjdbOverhang 60 --limitGenomeGenerateRAM 130000000000
+
+ ## Align to genome reference
+
+ STAR --runThreadN 4 --genomeDir ./GenomeRef --readFilesIn ./Data/Sample#_PGM_QualTrim.fastq --outFileNamePrefix Sample#
+
+ 
+ #### miRNA identification using mirDeep
+
+
+ module load mirdeep/2.0
+
+ bwa_sam_converter.pl -i Sample#Aligned.out.sam -c -o Sample#_reads_collapsed.fa -a Sample#_reads_collapsed_genome.arf
+
+ perl -plane 's/\s+.+$//' < ./GenomeRef/Mus_musculus.GRCm38.dna.primary_assembly.fa > mmu_primary_genome.fa
+
+
+ ## Map reads to miRNA and quantify
+
+ quantifier.pl -p ../../mus_pre.fa -m ../../mus_mature.fa -r Sample#_reads_collapsed.fa -d -t mmu -j
+
+
+ ## Combine quantifyer results csv for EdgeR
+
+ create_miRNA_expression_matrix.py -i ../2xtg_miRNA.txt -o 2xtgmiRNA 
+ 
+
+## MirDeep2 attempt 2
+module load conda3
+source activate mirdeep2012
+
+bowtie-build /GenomeRef/Mus_musculus.GRCm38.dna.primary_assembly.fa Mus_musculus.GRCm38.dna.primary_assembly
+
+bwa_sam_converter.pl -i Sample#Aligned.out.sam -c -o Sample#_reads_collapsed.fa -a Sample#_reads_collapsed_genome.arf
+
+quantifier.pl -p ./mus_pre.fa -m ./mus_mature.fa -r Sample#_reads_collapsed.fa -d -t mmu -j
