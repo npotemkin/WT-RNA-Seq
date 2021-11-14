@@ -1,20 +1,20 @@
 #### Perform fastqc
 module load fastqc/0.11.5
- fastqc -extract -outdir=./Data/QC_Data ./Data/Sample#_PGM.fastq
+ fastqc -extract -outdir=./Data/QC_Data ./Data/Sample#_Proton.fastq
 
 
  #### Adapter removal
 
  module load AdapterRemoval/2.1.7-04d254b
 
- AdapterRemoval --file1 Sample#_PGM.fastq --adapter1  --adapter2 GGCCAAGGCG --basename Sample#_PGM_AdaptTrim
+ AdapterRemoval --file1 Sample#_Proton.fastq --adapter1  --adapter2 GGCCAAGGCG --basename Sample#_Proton_AdaptTrim
 
  
  #### Quality trimming
 
  module load trimmomatic/0.38
 
- trimmomatic-se -threads 4 -phred33 Sample#_PGM_AdaptTrim.truncated  Sample#_PGM_QualTrim.fastq SLIDINGWINDOW:5:20 MINLEN:17
+ trimmomatic-se -threads 4 -phred33 Sample#_Proton_AdaptTrim.truncated  Sample#_Proton_QualTrim.fastq SLIDINGWINDOW:5:20 MINLEN:17
 
  
  #### Read Alignment
@@ -27,7 +27,7 @@ module load fastqc/0.11.5
 
  ## Align to genome reference
 
- STAR --runThreadN 4 --genomeDir ./GenomeRef --readFilesIn ./Data/Sample#_PGM_QualTrim.fastq --outFileNamePrefix Sample#
+ STAR --runThreadN 4 --genomeDir ./GenomeRef --readFilesIn ./Data/Sample#_Proton_QualTrim.fastq --outFileNamePrefix Sample#
 
  
  #### miRNA identification using mirDeep
