@@ -2,7 +2,7 @@
 
 ## Summary
 
-These scripts were used to analyse data obtained from Ion Torrent sequencing of mouse brain tissue.
+These scripts were used to analyse data obtained from Ion Torrent Proton sequencing of mouse brain tissue.
 
 These data are available on GEO at GSE163878 (https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE163878).
 
