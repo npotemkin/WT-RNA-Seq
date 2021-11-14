@@ -1,0 +1,25 @@
+## Load all necessary R libraries
+library(Rsamtools)
+library(Rsubread)
+library(edgeR)
+library(stringr)
+library(ggplot2)
+library(matrixStats)
+library(pheatmap)
+
+## Create vector of input .sam files
+tgsamlist<-c("Sample#1Aligned.out.sam","Sample#2Aligned.out.sam","Sample#3Aligned.out.sam","Sample#4Aligned.out.sam",
+             "Sample#5Aligned.out.sam","Sample#6Aligned.out.sam","Sample#7Aligned.out.sam","Sample#8Aligned.out.sam")
+
+## Conver output .sam files to .bam (if needed)
+
+for (i in tgsamlist) {
+    asBam(i)
+}
+
+## Create vector of bam files
+tgbamlist<-gsub("sam","bam",tgsamlist)
+
+## Count aligned reads, compare to annotated genome file
+2xtg_FC <- featureCounts(files = tgbamlist,
+                      annot.ext = 'Mus_musculus.GRCm38.95.chr.gtf', isGTFAnnotationFile=TRUE, nthreads= 4)
